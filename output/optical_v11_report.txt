@@ -1,0 +1,53 @@
+===== 光计算加速医学影像诊断 V11（迁移学习 + CutMix）=====
+时间：2026-07-14 11:17:49
+改进：迁移学习(ResNet18初始化光卷积权重+冻结前2层) + CutMix(p=0.5,alpha=1.0) + V8全部优化
+
+设备: cuda
+V11 改进: 迁移学习(ResNet18初始化+冻结前2层)+CutMix(α=1.0,p=0.5)
+V8基座: FocalLoss(γ=3.0)+FC(8192->384->64->2)+Dropout=0.5
+NORMAL过采5x | TTA=15 | 温度T=1.5 | 标签平滑=0.05
+Epochs=60 | Batch=64 | lr=0.001
+
+原始训练集分布: NORMAL=1341, PNEUMONIA=3875
+训练集(过采样后): NORMAL=5030, PNEUMONIA=3624
+验证集(分层): NORMAL=335(57.2%), PNEUMONIA=251(42.8%)
+测试集: 624
+
+===== 迁移学习：加载ResNet18预训练权重 =====
+ResNet18预训练模型加载成功
+ResNet18 conv1 shape: torch.Size([64, 3, 7, 7])
+ResNet18 conv2 shape: torch.Size([64, 64, 3, 3])
+ResNet18 conv3 shape: torch.Size([128, 64, 3, 3])
+ResNet18 conv4 shape: torch.Size([256, 128, 3, 3])
+  OpticalConv1: 用ResNet18.conv1前16通道初始化 ✓
+  OpticalConv2: 用ResNet18.layer1[0].conv1初始化 ✓
+  OpticalConv3: 用ResNet18.layer2[0].conv1初始化 ✓
+  OpticalConv4: 用ResNet18.layer3[0].conv1初始化 ✓
+ResNet18预训练权重初始化完成！
+冻结前2层光卷积层: OpticalConv1, OpticalConv2
+可训练层: OpticalConv3-4 + 全部OpticalPool + FC
+
+总参数量: 3,269,426
+可训练参数量: 3,264,626
+光计算层清单:
+  OpticalConv_conv1              Shape: (9, 16)                   计算量:      144 (冻结)
+  OpticalConv_conv2              Shape: (144, 32)                 计算量:    4,608 (冻结)
+  OpticalConv_conv3              Shape: (288, 64)                 计算量:   18,432 
+  OpticalConv_conv4              Shape: (576, 128)                计算量:   73,728 
+  OpticalPool_pool1              Shape: (4, 1)                    计算量:       64 
+  OpticalPool_pool2              Shape: (4, 1)                    计算量:      128 
+  OpticalPool_pool3              Shape: (4, 1)                    计算量:      256 
+  OpticalPool_pool4              Shape: (4, 1)                    计算量:      512 
+  FC_0(8192->384)                Shape: (8192, 384)               计算量: 3,145,728 
+  FC_1(384->64)                  Shape: (384, 64)                 计算量:   24,576 
+  FC_2(64->2)                    Shape: (64, 2)                   计算量:      128 
+光计算量: 3,268,304 | Ro = 96.36%
+
+E[  1/60] [CutMix] L:0.0759 ValAcc:0.5000(50.00%) [NORMAL: 47/335(14.0%) | PNEUMONIA: 246/251(98.0%)] lr:1.00e-03 T:74s
+  -> 新最佳(加权=39.21%) Acc=50.00% NORMAL_Recall=14.0% (已保存)
+E[  2/60]         L:0.0312 ValAcc:0.9471(94.71%) [NORMAL: 331/335(98.8%) | PNEUMONIA: 224/251(89.2%)] lr:1.00e-03 T:150s
+  -> 新最佳(加权=95.94%) Acc=94.71% NORMAL_Recall=98.8% (已保存)
+E[  3/60] [CutMix] L:0.0474 ValAcc:0.4317(43.17%) [NORMAL: 2/335(0.6%) | PNEUMONIA: 251/251(100.0%)] lr:1.00e-03 T:224s
+E[  4/60]         L:0.0243 ValAcc:0.9710(97.10%) [NORMAL: 329/335(98.2%) | PNEUMONIA: 240/251(95.6%)] lr:1.00e-03 T:300s
+  -> 新最佳(加权=97.43%) Acc=97.10% NORMAL_Recall=98.2% (已保存)
+E[  5/60]         L:0.0217 ValAcc:0.9693(96.93%) [NORMAL: 329/335(98.2%) | PNEUMONIA: 239/251(95.2%)] lr:1.00e-03 T:376s
