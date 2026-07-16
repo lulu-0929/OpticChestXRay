@@ -456,4 +456,4 @@ if __name__ == "__main__":
         btn_p1.click(lambda: pneumonia_examples[0], None, img_in)
         btn_p2.click(lambda: pneumonia_examples[1], None, img_in)
 
-    demo.launch(server_name="0.0.0.0", server_port=7860, share=False)
+    demo.launch(server_name="0.0.0.0", server_port=7865, share=False)
