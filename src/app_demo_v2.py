@@ -18,6 +18,10 @@ from PIL import Image
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+# ====== 全局配置 matplotlib 中文字体 fallback ======
+plt.rcParams['font.sans-serif'] = ['DejaVu Sans', 'SimHei', 'Microsoft YaHei', 'WenQuanYi Micro Hei', 'Noto Sans CJK SC', 'AR PL UMing CN', 'sans-serif']
+plt.rcParams['axes.unicode_minus'] = False
+# ======
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -245,14 +249,14 @@ def make_heatmap(img_pil, cam):
     fig, axes = plt.subplots(1, 3, figsize=(15, 5))
     fig.patch.set_facecolor('#1a1a2e')
     axes[0].imshow(np.array(img_rgb), cmap='gray')
-    axes[0].set_title('原始 X 光片', fontsize=13, color='white')
+    axes[0].set_title('Original X-Ray', fontsize=13, color='white')
     axes[0].axis('off')
     axes[1].imshow(cam, cmap='jet', alpha=0.7)
-    axes[1].set_title('Grad-CAM 病灶热力图', fontsize=13, color='#ff6b6b', fontweight='bold')
+    axes[1].set_title('Grad-CAM Heatmap', fontsize=13, color='#ff6b6b', fontweight='bold')
     axes[1].axis('off')
     axes[2].imshow(np.array(img_rgb), cmap='gray', alpha=0.6)
     axes[2].imshow(cam, cmap='jet', alpha=0.5)
-    axes[2].set_title('叠加效果', fontsize=13, color='white')
+    axes[2].set_title('Overlay', fontsize=13, color='white')
     axes[2].axis('off')
     plt.tight_layout()
     fig.canvas.draw()
@@ -261,16 +265,16 @@ def make_heatmap(img_pil, cam):
     return overlay
 
 
-def make_chart(probs, title="诊断概率分布"):
-    """生成概率柱状图（深色主题）"""
-    class_names = ['NORMAL（正常）', 'PNEUMONIA（肺炎）']
+def make_chart(probs, title="Diagnosis Probability"):
+    """生成概率柱状图（深色主题，使用英文标签避免容器缺字体）"""
+    class_names = ['Normal', 'Pneumonia']
     colors = ['#4CAF50', '#f44336']
     fig, ax = plt.subplots(figsize=(5, 3.5))
     fig.patch.set_facecolor('#1a1a2e')
     ax.set_facecolor('#16213e')
     bars = ax.bar(class_names, probs, color=colors, width=0.5)
     ax.set_ylim(0, 1)
-    ax.set_ylabel('概率', fontsize=12, color='#ccd6f6')
+    ax.set_ylabel('Probability', fontsize=12, color='#ccd6f6')
     ax.set_title(title, fontsize=14, fontweight='bold', color='#ccd6f6')
     ax.tick_params(colors='#ccd6f6', labelsize=10)
     for bar, prob in zip(bars, probs):
@@ -427,25 +431,25 @@ def compare_images(img_old, img_new, note_old="旧影像", note_new="新影像")
         img_arr = np.array(r['image'].resize((IMG_SIZE, IMG_SIZE)).convert('RGB'))
 
         axes[i, 0].imshow(img_arr, cmap='gray')
-        axes[i, 0].set_title(f'{label} — 原始', fontsize=12, color='white')
+        axes[i, 0].set_title(f'{label} -- Original', fontsize=12, color='white')
         axes[i, 0].axis('off')
 
         axes[i, 1].imshow(r['cam'], cmap='jet', alpha=0.7)
-        axes[i, 1].set_title(f'{label} — 热力图', fontsize=12, color='white')
+        axes[i, 1].set_title(f'{label} -- CAM', fontsize=12, color='white')
         axes[i, 1].axis('off')
 
         axes[i, 2].imshow(img_arr, cmap='gray', alpha=0.6)
         axes[i, 2].imshow(r['cam'], cmap='jet', alpha=0.5)
-        axes[i, 2].set_title(f'{label} — 叠加', fontsize=12, color='white')
+        axes[i, 2].set_title(f'{label} -- Overlay', fontsize=12, color='white')
         axes[i, 2].axis('off')
 
         axes[i, 3].set_facecolor('#16213e')
-        bars = axes[i, 3].bar(['正常', '肺炎'],
+        bars = axes[i, 3].bar(['Normal', 'Pneumonia'],
                               [r['normal_prob'], r['pneumonia_prob']],
                               color=['#4CAF50', '#f44336'], width=0.5)
         axes[i, 3].set_ylim(0, 1)
-        axes[i, 3].set_ylabel('概率', color='#ccd6f6')
-        axes[i, 3].set_title(f'{label}\n预测：{"肺炎⚠" if r["pred_class"]==1 else "正常✅"}',
+        axes[i, 3].set_ylabel('Prob.', color='#ccd6f6')
+        axes[i, 3].set_title(f'{label}\nPred: {"Pneumonia" if r["pred_class"]==1 else "Normal"}',
                              fontsize=12, color='white')
         axes[i, 3].tick_params(colors='#ccd6f6')
         for spine in axes[i, 3].spines.values():
@@ -466,12 +470,12 @@ def compare_images(img_old, img_new, note_old="旧影像", note_new="新影像")
     report += "=" * 50 + "\n\n"
     if r_old:
         report += f"【{note_old}】\n"
-        report += f"  诊断：{'肺炎阳性⚠' if r_old['pred_class'] else '正常✅'}\n"
+        report += f"  诊断：{'Pneumonia' if r_old['pred_class'] else 'Normal'}\n"
         report += f"  肺炎概率：{r_old['pneumonia_prob']*100:.1f}%\n"
         report += f"  一致性：{r_old['consensus']*100:.0f}%\n\n"
     if r_new:
         report += f"【{note_new}】\n"
-        report += f"  诊断：{'肺炎阳性⚠' if r_new['pred_class'] else '正常✅'}\n"
+        report += f"  诊断：{'Pneumonia' if r_new['pred_class'] else 'Normal'}\n"
         report += f"  肺炎概率：{r_new['pneumonia_prob']*100:.1f}%\n"
         report += f"  一致性：{r_new['consensus']*100:.0f}%\n\n"
     if r_old and r_new:
@@ -545,7 +549,7 @@ def batch_diagnose(images, filenames):
             img_arr = np.array(r['image'].resize((IMG_SIZE, IMG_SIZE)).convert('RGB'))
             axes[i].imshow(img_arr, cmap='gray')
             color = '#4CAF50' if r['pred_class'] == 0 else '#f44336'
-            axes[i].set_title(f"{r['filename']}\n肺炎{r['pneumonia_prob']*100:.1f}%",
+            axes[i].set_title(f"{r['filename']}\nP={r['pneumonia_prob']*100:.1f}%",
                               fontsize=10, color=color)
         else:
             axes[i].axis('off')
@@ -562,15 +566,16 @@ def batch_diagnose(images, filenames):
 # 深色PACS医疗风格CSS
 # ================================================================
 CUSTOM_CSS = """
-/* ===== 全局基调：深色PACS风格 ===== */
+/* ===== 全局基调：深色PACS风格（高对比度优化） ===== */
 :root {
     --bg-primary: #0a0e1a;
     --bg-secondary: #141829;
     --bg-card: #1a1f35;
     --bg-hover: #242b45;
-    --border-color: #2a3255;
-    --text-primary: #e8eaf0;
-    --text-secondary: #8892b0;
+    --bg-input: #1e2440;
+    --border-color: #364060;
+    --text-primary: #f0f4ff;
+    --text-secondary: #b0c4de;
     --accent-blue: #4a7cf7;
     --accent-cyan: #00d4ff;
     --accent-green: #4CAF50;
@@ -670,20 +675,43 @@ button.tab-nav.selected {
 
 /* ===== 文本输入框/输出框 ===== */
 textarea, input, .gr-text-input, .gr-box {
-    background: var(--bg-secondary) !important;
+    background: var(--bg-input) !important;
     border: 1px solid var(--border-color) !important;
-    color: var(--text-primary) !important;
+    color: #ffffff !important;
     border-radius: 8px !important;
+    font-size: 14px !important;
 }
 label, .gr-label {
-    color: var(--text-secondary) !important;
+    color: #b0c4de !important;
     font-size: 13px !important;
+    font-weight: 600 !important;
 }
 
 /* ===== 图片容器 ===== */
 .gr-image {
     border-radius: 10px !important;
     border: 1px solid var(--border-color) !important;
+}
+
+/* ===== 标签/文字增强对比度 ===== */
+.gr-markdown, .panel, .card p, .card span {
+    color: #e0e8f5 !important;
+}
+h1, h2, h3, h4, h5 {
+    color: #f0f4ff !important;
+}
+.gr-box label, label span {
+    color: #b0c4de !important;
+    font-weight: 600 !important;
+}
+/* Markdown内文字/链接 */
+.gr-markdown p {
+    color: #e0e8f5 !important;
+    font-size: 14px !important;
+    line-height: 1.7 !important;
+}
+.gr-markdown strong {
+    color: #ffffff !important;
 }
 
 /* ===== 状态标签行 ===== */
