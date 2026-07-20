@@ -574,8 +574,8 @@ CUSTOM_CSS = """
     --bg-hover: #242b45;
     --bg-input: #1e2440;
     --border-color: #364060;
-    --text-primary: #f0f4ff;
-    --text-secondary: #b0c4de;
+    --text-primary: #ffffff;
+    --text-secondary: #ffffff;
     --accent-blue: #4a7cf7;
     --accent-cyan: #00d4ff;
     --accent-green: #4CAF50;
@@ -605,7 +605,7 @@ body, .gradio-container {
     margin: 0; font-size: 22px; color: var(--accent-cyan);
 }
 .top-bar p {
-    margin: 6px 0 0; color: var(--text-secondary); font-size: 13px;
+    margin: 6px 0 0; color: #ffffff; font-size: 13px;
 }
 
 /* ===== 功能卡片 ===== */
@@ -682,7 +682,7 @@ textarea, input, .gr-text-input, .gr-box {
     font-size: 14px !important;
 }
 label, .gr-label {
-    color: #b0c4de !important;
+    color: #ffffff !important;
     font-size: 13px !important;
     font-weight: 600 !important;
 }
@@ -695,18 +695,18 @@ label, .gr-label {
 
 /* ===== 标签/文字增强对比度 ===== */
 .gr-markdown, .panel, .card p, .card span {
-    color: #e0e8f5 !important;
+    color: #ffffff !important;
 }
 h1, h2, h3, h4, h5 {
-    color: #f0f4ff !important;
+    color: #ffffff !important;
 }
 .gr-box label, label span {
-    color: #b0c4de !important;
+    color: #ffffff !important;
     font-weight: 600 !important;
 }
 /* Markdown内文字/链接 */
 .gr-markdown p {
-    color: #e0e8f5 !important;
+    color: #ffffff !important;
     font-size: 14px !important;
     line-height: 1.7 !important;
 }
@@ -726,7 +726,7 @@ h1, h2, h3, h4, h5 {
 .badge-cyan { background: rgba(0,212,255,0.1); color: var(--accent-cyan); }
 .badge-green { background: rgba(76,175,80,0.15); color: var(--accent-green); }
 .badge-red { background: rgba(244,67,54,0.15); color: var(--accent-red); }
-.badge-gray { background: rgba(136,146,176,0.1); color: var(--text-secondary); }
+.badge-gray { background: rgba(136,146,176,0.1); color: #ffffff; }
 
 /* ===== 滚动条 ===== */
 ::-webkit-scrollbar { width: 6px; }
@@ -787,7 +787,7 @@ if __name__ == "__main__":
                     <h1>🔦 光计算加速医学影像诊断系统</h1>
                     <p>LTSimulator 光子计算平台 | Ro≈96.36% | {MODEL_VER} | 多轮投票稳定推理</p>
                 </div>
-                <div style="text-align:right; font-size:12px; color:#8892b0;">
+                <div style="text-align:right; font-size:12px; color:#cccccc;">
                     <span class="status-badge badge-cyan">● 稳定模式</span><br>
                     投票次数：5
                 </div>
@@ -808,7 +808,7 @@ if __name__ == "__main__":
                         img_input = gr.Image(type="pil", label="", height=320)
                         btn_diagnose = gr.Button("🚀 开始诊断", variant="primary", size="lg")
 
-                        gr.HTML('<div style="margin-top:10px;font-size:13px;color:#8892b0;">快速加载示例图：</div>')
+                        gr.HTML('<div style="margin-top:10px;font-size:13px;color:#cccccc;">快速加载示例图：</div>')
                         with gr.Row():
                             btn_n1 = gr.Button("正常1", size="sm")
                             btn_n2 = gr.Button("正常2", size="sm")
@@ -845,7 +845,7 @@ if __name__ == "__main__":
                 gr.HTML("""
                 <div class="func-card">
                     <div class="func-card-title">📤 批量上传</div>
-                    <div style="font-size:13px; color:#8892b0; margin-bottom:8px;">
+                    <div style="font-size:13px; color:#cccccc; margin-bottom:8px;">
                         支持一次选择多张X光片，系统自动批量诊断并汇总结果（支持JPG/PNG）。
                         临床场景：一个病人多次拍片可一次性导入分析。
                     </div>
@@ -888,7 +888,7 @@ if __name__ == "__main__":
                 gr.HTML("""
                 <div class="func-card">
                     <div class="func-card-title">📝 诊断记录与病历管理</div>
-                    <div style="font-size:13px; color:#8892b0;">
+                    <div style="font-size:13px; color:#cccccc;">
                         选择影像→AI生成诊断报告→医生审核修改→生成最终病历。
                         <i>（完整病历数据库需后端支持，当前为单次病历生成）</i>
                     </div>
