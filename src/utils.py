@@ -6,6 +6,7 @@
 
 import time
 import torch
+import numpy as np
 from config import LOG_FILE, BEST_MODEL_PATH
 
 
@@ -154,3 +155,18 @@ def print_optical_layers(model, optical_ops, Ro):
     log_print("-" * 80)
     log_print(f"{'总计':<4} {'':<22} {'':<30} {optical_ops:<15,}")
     log_print(f"光占比 Ro = {Ro*100:.2f}%")
+
+
+def set_seed(seed=42):
+    """
+    固定所有随机种子，确保同一张图多次推理结果一致
+    用于 Demo 的诊断稳定性保障
+    """
+    import random
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False

@@ -50,3 +50,7 @@ test_transform = transforms.Compose([
     transforms.ToTensor(),
     transforms.Normalize(mean=[0.5], std=[0.5])
 ])
+
+# ====== Demo 常量（供 app_demo_v2.py 使用）======
+TEMPERATURE = 1.5           # 温度校准参数
+NORMAL_THRESHOLD = 0.50     # NORMAL 判决阈值（V18 蒸馏最优）
